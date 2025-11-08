@@ -282,6 +282,22 @@ const baseUrl = import.meta.env.BASE_URL;
         background: var(--bg-card);
       }
 
+      tbody tr.vendor-group-even {
+        background: rgba(30, 41, 59, 0.3);
+      }
+
+      tbody tr.vendor-group-odd {
+        background: rgba(15, 23, 42, 0.3);
+      }
+
+      tbody tr.vendor-group-even:hover {
+        background: rgba(51, 65, 85, 0.5);
+      }
+
+      tbody tr.vendor-group-odd:hover {
+        background: rgba(30, 41, 59, 0.5);
+      }
+
       .vendor-divider {
         height: 2px;
         background: var(--border);
@@ -437,6 +453,14 @@ const baseUrl = import.meta.env.BASE_URL;
         <canvas id="scatterChart"></canvas>
       </div>
 
+      <div class="chart-container">
+        <h2>Models by Vendor</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.95rem;">
+          Total count of tool-capable models available from each vendor.
+        </p>
+        <canvas id="vendorChart"></canvas>
+      </div>
+
       <div class="controls">
         <div class="search-box">
           <input
@@ -494,12 +518,14 @@ const baseUrl = import.meta.env.BASE_URL;
     <script>
       import Papa from 'papaparse';
       import { Chart, registerables } from 'chart.js';
-      Chart.register(...registerables);
+      import annotationPlugin from 'chartjs-plugin-annotation';
+      Chart.register(...registerables, annotationPlugin);
 
       let allModels = [];
       let filteredModels = [];
       let currentSort = { column: null, direction: 'asc' };
       let chart = null;
+      let vendorChart = null;
 
       // Vendor name mapping
       const vendorNameMap = {
@@ -568,6 +594,7 @@ const baseUrl = import.meta.env.BASE_URL;
           updateStats();
           renderTable();
           createChart();
+          createVendorChart();
         } catch (error) {
           console.error('Error loading data:', error);
           document.getElementById('tableBody').innerHTML =
@@ -651,16 +678,21 @@ const baseUrl = import.meta.env.BASE_URL;
         });
 
         let currentVendor = '';
+        let vendorIndex = 0;
         const rows = sortedModels.map((model, index) => {
           const isNewVendor = model.vendor !== currentVendor;
-          currentVendor = model.vendor;
+          if (isNewVendor) {
+            currentVendor = model.vendor;
+            vendorIndex++;
+          }
 
+          const vendorClass = vendorIndex % 2 === 0 ? 'vendor-group-even' : 'vendor-group-odd';
           const vendorDivider = isNewVendor && index > 0
             ? '<tr class="vendor-divider"><td colspan="6"></td></tr>'
             : '';
 
           return `${vendorDivider}
-          <tr>
+          <tr class="${vendorClass}">
             <td><strong>${model.model_name}</strong></td>
             <td><span class="vendor-tag">${model.vendor}</span></td>
             <td>${formatNumber(model.context_length)}</td>
@@ -683,6 +715,12 @@ const baseUrl = import.meta.env.BASE_URL;
 
       function createChart() {
         const ctx = document.getElementById('scatterChart');
+
+        // Calculate median values for quadrant lines
+        const prices = allModels.map(m => m.output_price_usd_per_m).filter(p => p > 0);
+        const contexts = allModels.map(m => m.context_length).filter(c => c > 0);
+        const medianPrice = median(prices) || 2.5;
+        const medianContext = median(contexts) || 100000;
 
         // Group by quadrant
         const datasets = ['Q1', 'Q2', 'Q3', 'Q4', 'Free'].map(quadrant => {
@@ -734,6 +772,42 @@ const baseUrl = import.meta.env.BASE_URL;
                     ];
                   }
                 }
+              },
+              annotation: {
+                annotations: {
+                  verticalLine: {
+                    type: 'line',
+                    xMin: medianContext,
+                    xMax: medianContext,
+                    borderColor: 'rgba(241, 245, 249, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    label: {
+                      display: true,
+                      content: `Median Context: ${formatNumber(medianContext)}`,
+                      position: 'start',
+                      color: '#f1f5f9',
+                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      padding: 6
+                    }
+                  },
+                  horizontalLine: {
+                    type: 'line',
+                    yMin: medianPrice,
+                    yMax: medianPrice,
+                    borderColor: 'rgba(241, 245, 249, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    label: {
+                      display: true,
+                      content: `Median Price: $${medianPrice.toFixed(2)}`,
+                      position: 'end',
+                      color: '#f1f5f9',
+                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      padding: 6
+                    }
+                  }
+                }
               }
             },
             scales: {
@@ -762,6 +836,75 @@ const baseUrl = import.meta.env.BASE_URL;
                   callback: (value) => '$' + value.toFixed(2)
                 },
                 grid: { color: '#475569' }
+              }
+            }
+          }
+        });
+      }
+
+      function createVendorChart() {
+        const ctx = document.getElementById('vendorChart');
+
+        // Count models by vendor
+        const vendorCounts = {};
+        allModels.forEach(model => {
+          vendorCounts[model.vendor] = (vendorCounts[model.vendor] || 0) + 1;
+        });
+
+        // Sort vendors by count (descending)
+        const sortedVendors = Object.entries(vendorCounts)
+          .sort((a, b) => b[1] - a[1]);
+
+        const labels = sortedVendors.map(v => v[0]);
+        const data = sortedVendors.map(v => v[1]);
+
+        vendorChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Number of Models',
+              data: data,
+              backgroundColor: 'rgba(59, 130, 246, 0.6)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'y', // Horizontal bar chart
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    return `${context.parsed.x} model${context.parsed.x !== 1 ? 's' : ''}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#cbd5e1',
+                  stepSize: 1
+                },
+                grid: { color: '#475569' },
+                title: {
+                  display: true,
+                  text: 'Number of Models',
+                  color: '#f1f5f9'
+                }
+              },
+              y: {
+                ticks: {
+                  color: '#cbd5e1'
+                },
+                grid: { display: false }
               }
             }
           }

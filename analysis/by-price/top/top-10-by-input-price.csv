@@ -1,0 +1,11 @@
+model_name,vendor,context_length,input_price_usd_per_m,output_price_usd_per_m,avg_price_usd_per_m
+OpenAI: GPT-4 (older v0314),openai,8191,30.0,60.0,45.0
+OpenAI: GPT-4,openai,8191,30.0,60.0,45.0
+OpenAI: o3 Pro,openai,200000,20.0,80.0,50.0
+OpenAI: GPT-5 Pro,openai,400000,15.0,120.0,67.5
+Anthropic: Claude Opus 4.1,anthropic,200000,15.0,75.0,45.0
+Anthropic: Claude Opus 4,anthropic,200000,15.0,75.0,45.0
+OpenAI: o1,openai,200000,15.0,60.0,37.5
+Anthropic: Claude 3 Opus,anthropic,200000,15.0,75.0,45.0
+OpenAI: GPT-5 Image,openai,400000,10.0,10.0,10.0
+OpenAI: o3 Deep Research,openai,200000,10.0,40.0,25.0

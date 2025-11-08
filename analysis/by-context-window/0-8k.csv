@@ -1,0 +1,5 @@
+model_name,model_id,vendor,context_length,input_price_usd_per_m,output_price_usd_per_m,description
+Mistral: Mistral 7B Instruct v0.1,mistralai/mistral-7b-instruct-v0.1,mistralai,2824,0.11,0.19,"A 7.3B parameter model that outperforms Llama 2 13B on all benchmarks, with optimizations for speed and context length."
+OpenAI: GPT-3.5 Turbo (older v0613),openai/gpt-3.5-turbo-0613,openai,4095,1.0,2.0,"GPT-3.5 Turbo is OpenAI's fastest model. It can understand and generate natural language or code, and is optimized for chat and traditional completion tasks.  Training data up to Sep 2021."
+OpenAI: GPT-4 (older v0314),openai/gpt-4-0314,openai,8191,30.0,60.0,"GPT-4-0314 is the first version of GPT-4 released, with a context length of 8,192 tokens, and was supported until June 14. Training data: up to Sep 2021."
+OpenAI: GPT-4,openai/gpt-4,openai,8191,30.0,60.0,"OpenAI's flagship model, GPT-4 is a large-scale multimodal language model capable of solving difficult problems with greater accuracy than previous models due to its broader general knowledge and advanced reasoning capabilities. Training data: up to Sep 2021."

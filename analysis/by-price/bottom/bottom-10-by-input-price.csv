@@ -1,0 +1,11 @@
+model_name,vendor,context_length,input_price_usd_per_m,output_price_usd_per_m,avg_price_usd_per_m
+Meta: Llama 3.2 3B Instruct,meta-llama,131072,0.02,0.02,0.02
+Meta: Llama 3.1 8B Instruct,meta-llama,131072,0.02,0.03,0.025
+Mistral: Mistral Nemo,mistralai,131072,0.02,0.04,0.03
+OpenAI: gpt-oss-20b,openai,131072,0.03,0.14,0.085
+DeepSeek: R1 Distill Llama 70B,deepseek,131072,0.03,0.13,0.08
+Mistral: Mistral 7B Instruct,mistralai,32768,0.03,0.05,0.04
+Mistral: Mistral 7B Instruct v0.3,mistralai,32768,0.03,0.05,0.04
+Meta: Llama 3 8B Instruct,meta-llama,8192,0.03,0.06,0.045
+NVIDIA: Nemotron Nano 9B V2,nvidia,131072,0.04,0.16,0.1
+OpenAI: gpt-oss-120b,openai,131072,0.04,0.4,0.22

@@ -1,0 +1,24 @@
+
+Context Window Distribution
+============================================================
+Band                 Count      Percentage     
+------------------------------------------------------------
+0-8K                 2            0.92%
+8K-16K               5            2.29%
+16K-32K              4            1.83%
+32K-64K              30          13.76%
+64K-128K             38          17.43%
+128K-256K            89          40.83%
+256K-512K            27          12.39%
+512K-1M              7            3.21%
+1M+                  16           7.34%
+------------------------------------------------------------
+Total                218                100.00%
+
+
+Key Insights:
+------------------------------------------------------------
+• Most common range: 128K-256K with 40.83% of models
+• 58.26% of models have context windows between 64K-256K
+• 5.05% have small context windows (under 32K)
+• 7.34% have massive context windows (over 1M tokens)

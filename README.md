@@ -1,6 +1,10 @@
-# OpenRouter Tool-Calling Models Analysis (Nov 8, 2025)
+# OpenRouter Tool-Calling Models Cost Analysis (Nov 8, 2025)
+
+![alt text](screenshots/1.png)
 
 A point-in-time cost comparison analysis of LLM APIs with tool calling capabilities, sourced from OpenRouter's API.
+
+Pricing data obtained directly from OpenAI API on Nov 8th 2025.
 
 ## Overview
 

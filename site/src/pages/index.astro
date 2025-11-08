@@ -425,6 +425,57 @@ const baseUrl = import.meta.env.BASE_URL;
         </p>
       </div>
 
+      <div class="intro" style="margin-bottom: 2rem;">
+        <h2>Why Tool-Calling Matters</h2>
+        <p>
+          Tool-calling is arguably an essential model requirement for agentic AI applications.
+          This capability enables LLMs to interact with external tools, APIs, and systems -
+          critical for MCP (Model Context Protocol) implementations, multi-tool orchestration,
+          and function calling workflows.
+        </p>
+        <p style="margin-top: 0.75rem;">
+          The LLM landscape is growing quickly. By making many models available for inference,
+          OpenRouter provides a rich source of parametric info about models' pricing as well as
+          technical information like their maximum context windows.
+        </p>
+      </div>
+
+      <div class="intro" style="margin-bottom: 2rem;">
+        <h2>Key Findings</h2>
+        <p>
+          <strong>Context window and pricing are remarkably variable:</strong>
+        </p>
+        <ul style="margin: 0.75rem 0 0 1.5rem; color: var(--text-secondary);">
+          <li>Context windows range from 33K tokens (some Mistral variants) to 2 million tokens - a <strong>60-fold difference</strong></li>
+          <li>Output pricing ranges from $0.20 per million tokens (Jamba Mini) to $75 (Opus) - more than <strong>300X difference</strong></li>
+          <li>These variations have significant ramifications for workflow suitability</li>
+        </ul>
+
+        <p style="margin-top: 1rem;">
+          <strong>The "Sweet Spot" Quadrant</strong> (Q1: Low Cost, High Context):
+        </p>
+        <p style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">
+          Models with context windows &gt; 150K tokens and output pricing &lt; $2 per million tokens.
+          This quadrant offers the best value for high-volume tool calling and agentic workflows.
+        </p>
+      </div>
+
+      <div class="intro" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1)); border-left-color: var(--success);">
+        <h2>Notable Models in the Sweet Spot</h2>
+        <p style="margin-bottom: 1rem;">
+          <strong>Outstanding Value:</strong> Grok 4 Fast - 2M token context window at just $0.30/$0.50 (input/output per million tokens)
+        </p>
+        <p>
+          <strong>Also in the Sweet Spot:</strong>
+        </p>
+        <ul style="margin: 0.75rem 0 0 1.5rem; color: var(--text-secondary);">
+          <li>Gemini 2.5</li>
+          <li>GPT 4 and GPT 5 Mini and Nano</li>
+          <li>Qwen 3</li>
+          <li>Z.AI GLM</li>
+        </ul>
+      </div>
+
       <div class="stats-grid" id="statsGrid">
         <div class="stat-card">
           <div class="stat-label">Total Models</div>
@@ -505,6 +556,13 @@ const baseUrl = import.meta.env.BASE_URL;
       </div>
 
       <footer>
+        <div style="background: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border-left: 3px solid var(--warning);">
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+            <strong style="color: var(--warning);">Important:</strong> This is a snapshot analysis from November 8, 2025.
+            Prices are subject to ongoing fluctuation according to OpenRouter's live pricing.
+            For current pricing, always refer to <a href="https://openrouter.ai/" target="_blank" rel="noopener" style="color: var(--accent);">OpenRouter's live API</a>.
+          </p>
+        </div>
         <p>
           Data sourced from <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> |
           View on <a href="https://huggingface.co/spaces/danielrosehill/Agentic-LLM-Price-Comparisons" target="_blank" rel="noopener">Hugging Face</a>

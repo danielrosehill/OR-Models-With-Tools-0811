@@ -21,21 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Build with Astro
+        uses: withastro/action@v3
         with:
+          path: ./site
           node-version: 22
-
-      - name: Install dependencies
-        run: cd site && npm ci
-
-      - name: Build
-        run: cd site && npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./site/dist
 
   deploy:
     environment:

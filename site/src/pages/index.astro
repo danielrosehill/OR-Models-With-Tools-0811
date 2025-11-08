@@ -282,6 +282,16 @@ const baseUrl = import.meta.env.BASE_URL;
         background: var(--bg-card);
       }
 
+      .vendor-divider {
+        height: 2px;
+        background: var(--border);
+      }
+
+      .vendor-divider td {
+        padding: 0;
+        height: 2px;
+      }
+
       .quadrant-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -395,7 +405,7 @@ const baseUrl = import.meta.env.BASE_URL;
         </ul>
         <p style="margin-top: 1rem;">
           Models are categorized into quadrants using median values as dividing lines,
-          helping you identify the best value for your specific use case.
+          allowing you to explore options across different cost and context combinations.
         </p>
       </div>
 
@@ -419,7 +429,11 @@ const baseUrl = import.meta.env.BASE_URL;
       </div>
 
       <div class="chart-container">
-        <h2>Cost vs. Context Analysis</h2>
+        <h2>Model Distribution by Cost & Context</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.95rem;">
+          Models are stratified by cost (output price per million tokens) and context window size,
+          divided at median values to create four quadrants for easier comparison.
+        </p>
         <canvas id="scatterChart"></canvas>
       </div>
 
@@ -487,6 +501,48 @@ const baseUrl = import.meta.env.BASE_URL;
       let currentSort = { column: null, direction: 'asc' };
       let chart = null;
 
+      // Vendor name mapping
+      const vendorNameMap = {
+        'meta-llama': 'Meta',
+        'openai': 'OpenAI',
+        'qwen': 'Qwen',
+        'anthropic': 'Anthropic',
+        'google': 'Google',
+        'mistralai': 'Mistral AI',
+        'cohere': 'Cohere',
+        'x-ai': 'xAI',
+        'deepseek': 'DeepSeek',
+        'alibaba': 'Alibaba',
+        'microsoft': 'Microsoft',
+        'perplexity': 'Perplexity',
+        'inflection': 'Inflection',
+        'ai21': 'AI21 Labs'
+      };
+
+      function normalizeVendorName(vendor) {
+        return vendorNameMap[vendor.toLowerCase()] || vendor;
+      }
+
+      function cleanModelName(modelName, vendor) {
+        // Remove vendor prefix from model name if it's duplicated
+        const vendorPrefixes = [
+          vendor,
+          vendor.replace('-', ''),
+          vendor.replace(' ', ''),
+          vendorNameMap[vendor.toLowerCase()]
+        ].filter(Boolean);
+
+        let cleaned = modelName;
+        for (const prefix of vendorPrefixes) {
+          const regex = new RegExp(`^${prefix}[\\s-/:]`, 'i');
+          if (regex.test(cleaned)) {
+            cleaned = cleaned.replace(regex, '');
+            break;
+          }
+        }
+        return cleaned;
+      }
+
       // Load and parse CSV data
       async function loadData() {
         try {
@@ -502,6 +558,8 @@ const baseUrl = import.meta.env.BASE_URL;
 
           allModels = result.data.map(row => ({
             ...row,
+            vendor: normalizeVendorName(row.vendor),
+            model_name: cleanModelName(row.model_name, row.vendor),
             quadrant: determineQuadrant(row)
           }));
 
@@ -584,7 +642,24 @@ const baseUrl = import.meta.env.BASE_URL;
           return;
         }
 
-        tbody.innerHTML = filteredModels.map(model => `
+        // Sort by vendor first, then by model name
+        const sortedModels = [...filteredModels].sort((a, b) => {
+          if (a.vendor !== b.vendor) {
+            return a.vendor.localeCompare(b.vendor);
+          }
+          return a.model_name.localeCompare(b.model_name);
+        });
+
+        let currentVendor = '';
+        const rows = sortedModels.map((model, index) => {
+          const isNewVendor = model.vendor !== currentVendor;
+          currentVendor = model.vendor;
+
+          const vendorDivider = isNewVendor && index > 0
+            ? '<tr class="vendor-divider"><td colspan="6"></td></tr>'
+            : '';
+
+          return `${vendorDivider}
           <tr>
             <td><strong>${model.model_name}</strong></td>
             <td><span class="vendor-tag">${model.vendor}</span></td>
@@ -600,8 +675,10 @@ const baseUrl = import.meta.env.BASE_URL;
                 ${model.quadrant}
               </span>
             </td>
-          </tr>
-        `).join('');
+          </tr>`;
+        }).join('');
+
+        tbody.innerHTML = rows;
       }
 
       function createChart() {
@@ -719,7 +796,7 @@ const baseUrl = import.meta.env.BASE_URL;
             } else if (filter === 'free') {
               filteredModels = allModels.filter(m => m.output_price_usd_per_m === 0);
             } else if (filter.startsWith('quadrant-')) {
-              const quadrant = filter.split('-')[1].toUpperCase();
+              const quadrant = 'Q' + filter.split('-')[1]; // Extract Q1, Q2, Q3, Q4
               filteredModels = allModels.filter(m => m.quadrant === quadrant);
             }
 
